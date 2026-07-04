@@ -26,14 +26,14 @@ jobs:
         echo "# QYRA MagicCam API Keys" > .env.example
         echo "# Add your API keys here" >> .env.example
 
-    - name: Install Gradle 9.3.1 and Create Wrapper
+    - name: Install Gradle and Create Wrapper
       run: |
+        # Gradle 9.3.1'i /opt'a kur
         wget -q https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -O /tmp/gradle.zip
-        unzip -q /tmp/gradle.zip -d /tmp/
-        export GRADLE_HOME=/tmp/gradle-9.3.1
-        export PATH=$GRADLE_HOME/bin:$PATH
+        sudo unzip -q /tmp/gradle.zip -d /opt/
+        sudo ln -sf /opt/gradle-9.3.1/bin/gradle /usr/local/bin/gradle
+        # Wrapper oluştur
         gradle wrapper --gradle-version 9.3.1
-        rm -rf /tmp/gradle.zip /tmp/gradle-9.3.1
 
     - name: Cache Gradle packages
       uses: actions/cache@v4
