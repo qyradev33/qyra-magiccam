@@ -1,0 +1,6 @@
+{
+  "name": "Qyra MagicCam",
+  "description": "Advanced Liquid Glass camera simulator with 300x QMagicZoom, 8K 60FPS, Mod Store, and watermarked gallery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
