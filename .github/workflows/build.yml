@@ -1,3 +1,4 @@
+
 name: Build QYRA MagicCam APK
 
 on:
@@ -25,13 +26,13 @@ jobs:
       run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
     - name: Create .env.example
-      run: |
-        echo "# QYRA MagicCam API Keys" > .env.example
+      run: echo "# QYRA MagicCam API Keys" > .env.example
 
     - name: Create Dummy google-services.json
       run: |
         mkdir -p app/src/debug app/src/main
-        echo '{
+        cat > app/google-services.json << 'EOF'
+        {
           "project_info": {
             "project_number": "123456789",
             "project_id": "dummy-project",
@@ -42,15 +43,11 @@ jobs:
               "client_info": {
                 "mobilesdk_app_id": "1:123456789:android:dummy",
                 "android_client_info": {
-                  "package_name": "com.example"
+                  "package_name": "com.aistudio.magiccam.qyra"
                 }
               },
               "oauth_client": [],
-              "api_key": [
-                {
-                  "current_key": "dummy-key"
-                }
-              ],
+              "api_key": [{ "current_key": "dummy-key" }],
               "services": {
                 "appinvite_service": {
                   "other_platform_oauth_client": []
@@ -59,13 +56,13 @@ jobs:
             }
           ],
           "configuration_version": "1"
-        }' > app/google-services.json
+        }
+        EOF
         cp app/google-services.json app/src/debug/google-services.json
         cp app/google-services.json app/src/main/google-services.json
 
     - name: Create Debug Keystore
-      run: |
-        keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+      run: keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
     - name: Install Gradle and Create Wrapper
       run: |
