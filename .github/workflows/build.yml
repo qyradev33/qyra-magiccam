@@ -21,29 +21,58 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Fix SDK Path
+      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
     - name: Create .env.example
       run: |
         echo "# QYRA MagicCam API Keys" > .env.example
-        echo "# Add your API keys here" >> .env.example
+
+    - name: Create Dummy google-services.json
+      run: |
+        mkdir -p app/src/debug app/src/main
+        echo '{
+          "project_info": {
+            "project_number": "123456789",
+            "project_id": "dummy-project",
+            "storage_bucket": "dummy-project.appspot.com"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789:android:dummy",
+                "android_client_info": {
+                  "package_name": "com.example"
+                }
+              },
+              "oauth_client": [],
+              "api_key": [
+                {
+                  "current_key": "dummy-key"
+                }
+              ],
+              "services": {
+                "appinvite_service": {
+                  "other_platform_oauth_client": []
+                }
+              }
+            }
+          ],
+          "configuration_version": "1"
+        }' > app/google-services.json
+        cp app/google-services.json app/src/debug/google-services.json
+        cp app/google-services.json app/src/main/google-services.json
+
+    - name: Create Debug Keystore
+      run: |
+        keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
 
     - name: Install Gradle and Create Wrapper
       run: |
-        # Gradle 9.3.1'i /opt'a kur
         wget -q https://services.gradle.org/distributions/gradle-9.3.1-bin.zip -O /tmp/gradle.zip
         sudo unzip -q /tmp/gradle.zip -d /opt/
         sudo ln -sf /opt/gradle-9.3.1/bin/gradle /usr/local/bin/gradle
-        # Wrapper oluştur
         gradle wrapper --gradle-version 9.3.1
-
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --stacktrace
