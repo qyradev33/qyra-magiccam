@@ -21,21 +21,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Download and Setup Gradle Wrapper
+    - name: Install Gradle and Create Wrapper
       run: |
-        mkdir -p gradle/wrapper
-        curl -sL https://services.gradle.org/distributions/gradle-8.4-bin.zip -o /tmp/gradle.zip
+        # Gradle 8.4 indir
+        wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip -O /tmp/gradle.zip
         unzip -q /tmp/gradle.zip -d /tmp/
-        curl -sL https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew -o gradlew
-        chmod +x gradlew
-        cp /tmp/gradle-8.4/lib/plugins/gradle-wrapper-8.4.jar gradle/wrapper/gradle-wrapper.jar
-        echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-        echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-        echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
-        echo "networkTimeout=10000" >> gradle/wrapper/gradle-wrapper.properties
-        echo "validateDistributionUrl=true" >> gradle/wrapper/gradle-wrapper.properties
-        echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
-        echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+        export GRADLE_HOME=/tmp/gradle-8.4
+        export PATH=$GRADLE_HOME/bin:$PATH
+        # Wrapper oluştur
+        gradle wrapper --gradle-version 8.4
+        # Temizlik
         rm -rf /tmp/gradle.zip /tmp/gradle-8.4
 
     - name: Cache Gradle packages
